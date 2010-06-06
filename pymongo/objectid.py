@@ -16,6 +16,7 @@
 <http://dochub.mongodb.org/core/objectids>`_.
 """
 
+import binascii
 import calendar
 import datetime
 try:
@@ -37,7 +38,7 @@ def _machine_bytes():
     """Get the machine portion of an ObjectId.
     """
     machine_hash = _md5func()
-    machine_hash.update(socket.gethostname())
+    machine_hash.update(bytes(socket.gethostname(), 'utf-8'))
     return machine_hash.digest()[0:3]
 
 
@@ -141,9 +142,9 @@ class ObjectId(object):
         :Parameters:
           - `oid`: a valid ObjectId
         """
-        if isinstance(oid, ObjectId):
+        try:
             self.__id = oid.__id
-        elif isinstance(oid, str):
+        except AttributeError:
             if len(oid) == 12:
                 self.__id = oid
             elif len(oid) == 24:
@@ -180,7 +181,7 @@ class ObjectId(object):
         return self.__id.encode("hex")
 
     def __repr__(self):
-        return "ObjectId('%s')" % self.__id.encode("hex")
+        return "ObjectId('%s')" % binascii.hexlify(self.__id)
 
     def __cmp__(self, other):
         if isinstance(other, ObjectId):

@@ -580,7 +580,7 @@ class Connection(object):  # TODO support auth for pooling
         Takes length to receive and repeatedly calls recv until able to
         return a buffer of that length, raising ConnectionFailure on error.
         """
-        message = ""
+        message = b""
         while len(message) < length:
             chunk = sock.recv(length - len(message))
             if chunk == "":

@@ -34,7 +34,7 @@ except ImportError:
 from pymongo.errors import InvalidOperation
 
 
-__ZERO = "\x00\x00\x00\x00"
+__ZERO = b"\x00\x00\x00\x00"
 
 
 def __last_error():

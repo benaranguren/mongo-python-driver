@@ -118,9 +118,6 @@ class SON(dict):
     def values(self):
         return [v for _, v in self.items()]
 
-    def items(self):
-        return list(self.items())
-
     def clear(self):
         for key in list(self.keys()):
             del self[key]
