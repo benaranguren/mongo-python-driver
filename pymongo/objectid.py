@@ -143,7 +143,7 @@ class ObjectId(object):
         """
         if isinstance(oid, ObjectId):
             self.__id = oid.__id
-        elif isinstance(oid, basestring):
+        elif isinstance(oid, str):
             if len(oid) == 12:
                 self.__id = oid
             elif len(oid) == 24:

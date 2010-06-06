@@ -38,9 +38,9 @@ class DBRef(object):
 
         .. mongodoc:: dbrefs
         """
-        if not isinstance(collection, basestring):
+        if not isinstance(collection, str):
             raise TypeError("collection must be an instance of basestring")
-        if database is not None and not isinstance(database, basestring):
+        if database is not None and not isinstance(database, str):
             raise TypeError("database must be an instance of basestring")
 
         self.__collection = collection

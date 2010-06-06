@@ -32,7 +32,7 @@ from pymongo.max_key import MaxKey
 from pymongo.min_key import MinKey
 from pymongo.objectid import ObjectId
 from pymongo.son import SON
-from timestamp import Timestamp
+from .timestamp import Timestamp
 
 
 try:
@@ -69,14 +69,14 @@ def _get_c_string(data, length=None):
         except ValueError:
             raise InvalidBSON()
 
-    return (unicode(data[:length], "utf-8"), data[length + 1:])
+    return (str(data[:length], "utf-8"), data[length + 1:])
 
 
 def _make_c_string(string, check_null=False):
     if check_null and "\x00" in string:
         raise InvalidDocument("BSON keys / regex patterns must not "
                               "contain a NULL character")
-    if isinstance(string, unicode):
+    if isinstance(string, str):
         return string.encode("utf-8") + "\x00"
     else:
         try:
@@ -241,7 +241,7 @@ if _use_c:
 
 
 def _element_to_bson(key, value, check_keys):
-    if not isinstance(key, basestring):
+    if not isinstance(key, str):
         raise InvalidDocument("documents must have only string keys, "
                               "key was %r" % key)
 
@@ -280,14 +280,14 @@ def _element_to_bson(key, value, check_keys):
         cstring = _make_c_string(value)
         length = struct.pack("<i", len(cstring))
         return "\x02" + name + length + cstring
-    if isinstance(value, unicode):
+    if isinstance(value, str):
         cstring = _make_c_string(value)
         length = struct.pack("<i", len(cstring))
         return "\x02" + name + length + cstring
     if isinstance(value, dict):
         return "\x03" + name + _dict_to_bson(value, check_keys, False)
     if isinstance(value, (list, tuple)):
-        as_dict = SON(zip([str(i) for i in range(len(value))], value))
+        as_dict = SON(list(zip([str(i) for i in range(len(value))], value)))
         return "\x04" + name + _dict_to_bson(as_dict, check_keys, False)
     if isinstance(value, ObjectId):
         return "\x07" + name + value.binary
@@ -295,7 +295,7 @@ def _element_to_bson(key, value, check_keys):
         return "\x08" + name + "\x01"
     if value is False:
         return "\x08" + name + "\x00"
-    if isinstance(value, (int, long)):
+    if isinstance(value, int):
         # TODO this is a really ugly way to check for this...
         if value > 2 ** 64 / 2 - 1 or value < -2 ** 64 / 2:
             raise OverflowError("MongoDB can only handle up to 8-byte ints")
@@ -347,7 +347,7 @@ def _dict_to_bson(dict, check_keys, top_level=True):
         elements = ""
         if top_level and "_id" in dict:
             elements += _element_to_bson("_id", dict["_id"], False)
-        for (key, value) in dict.iteritems():
+        for (key, value) in dict.items():
             if not top_level or key != "_id":
                 elements += _element_to_bson(key, value, check_keys)
     except AttributeError:

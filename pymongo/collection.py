@@ -29,7 +29,7 @@ _ZERO = "\x00\x00\x00\x00"
 def _gen_index_name(keys):
     """Generate an index name from the set of fields it is over.
     """
-    return u"_".join([u"%s_%s" % item for item in keys])
+    return "_".join(["%s_%s" % item for item in keys])
 
 
 class Collection(object):
@@ -68,7 +68,7 @@ class Collection(object):
 
         .. mongodoc:: collections
         """
-        if not isinstance(name, basestring):
+        if not isinstance(name, str):
             raise TypeError("name must be an instance of basestring")
 
         if options is not None:
@@ -95,8 +95,8 @@ class Collection(object):
                               "null character")
 
         self.__database = database
-        self.__name = unicode(name)
-        self.__full_name = u"%s.%s" % (self.__database.name, self.__name)
+        self.__name = str(name)
+        self.__full_name = "%s.%s" % (self.__database.name, self.__name)
         if create or options is not None:
             self.__create(options)
 
@@ -121,7 +121,7 @@ class Collection(object):
         :Parameters:
           - `name`: the name of the collection to get
         """
-        return Collection(self.__database, u"%s.%s" % (self.__name, name))
+        return Collection(self.__database, "%s.%s" % (self.__name, name))
 
     def __getitem__(self, name):
         return self.__getattr__(name)
@@ -645,7 +645,7 @@ class Collection(object):
         """
         self.__database.connection._purge_index(self.__database.name,
                                                 self.__name)
-        self.drop_index(u"*")
+        self.drop_index("*")
 
     def drop_index(self, index_or_name):
         """Drops the specified index on this collection.
@@ -668,7 +668,7 @@ class Collection(object):
         if isinstance(index_or_name, list):
             name = _gen_index_name(index_or_name)
 
-        if not isinstance(name, basestring):
+        if not isinstance(name, str):
             raise TypeError("index_or_name must be an index name or list")
 
         self.__database.connection._purge_index(self.__database.name,
@@ -705,7 +705,7 @@ class Collection(object):
                                                   {"ns": 0}, as_class=SON)
         info = {}
         for index in raw:
-            index["key"] = index["key"].items()
+            index["key"] = list(index["key"].items())
             index = dict(index)
             info[index.pop("name")] = index
         return info
@@ -769,7 +769,7 @@ class Collection(object):
                           DeprecationWarning)
 
         group = {}
-        if isinstance(key, basestring):
+        if isinstance(key, str):
             group["$keyf"] = Code(key)
         elif key is not None:
             group = {"key": helpers._fields_list_to_dict(key)}
@@ -800,7 +800,7 @@ class Collection(object):
         .. versionadded:: 1.6+
            support for accepting keyword arguments for rename options
         """
-        if not isinstance(new_name, basestring):
+        if not isinstance(new_name, str):
             raise TypeError("new_name must be an instance of basestring")
 
         if not new_name or ".." in new_name:
@@ -872,7 +872,7 @@ class Collection(object):
     def __iter__(self):
         return self
 
-    def next(self):
+    def __next__(self):
         raise TypeError("'Collection' object is not iterable")
 
     def __call__(self, *args, **kwargs):

@@ -160,7 +160,7 @@ class Connection(object):  # TODO support auth for pooling
             warnings.warn("The timeout parameter to Connection is deprecated",
                           DeprecationWarning)
 
-        if not isinstance(host, basestring):
+        if not isinstance(host, str):
             raise TypeError("host must be an instance of basestring")
         if not isinstance(port, int):
             raise TypeError("port must be an instance of int")
@@ -443,7 +443,7 @@ class Connection(object):  # TODO support auth for pooling
                         self.__host = host
                         self.__port = port
                         return
-                except socket.error, e:
+                except socket.error as e:
                     sock_error = True
             finally:
                 if sock is not None:
@@ -570,7 +570,7 @@ class Connection(object):  # TODO support auth for pooling
                                                             sock)
                 return self.__check_response_to_last_error(response)
             return None
-        except (ConnectionFailure, socket.error), e:
+        except (ConnectionFailure, socket.error) as e:
             self._reset()
             raise AutoReconnect(str(e))
 
@@ -628,7 +628,7 @@ class Connection(object):  # TODO support auth for pooling
 
         try:
             return self.__send_and_receive(message, _sock)
-        except (ConnectionFailure, socket.error), e:
+        except (ConnectionFailure, socket.error) as e:
             if reset:
                 self._reset()
             raise AutoReconnect(str(e))
@@ -714,7 +714,7 @@ class Connection(object):  # TODO support auth for pooling
         .. seealso:: :meth:`set_cursor_manager` and
            the :mod:`~pymongo.cursor_manager` module
         """
-        if not isinstance(cursor_id, (int, long)):
+        if not isinstance(cursor_id, int):
             raise TypeError("cursor_id must be an instance of (int, long)")
 
         self.__cursor_manager.close(cursor_id)
@@ -758,7 +758,7 @@ class Connection(object):  # TODO support auth for pooling
         if isinstance(name, database.Database):
             name = name.name
 
-        if not isinstance(name, basestring):
+        if not isinstance(name, str):
             raise TypeError("name_or_database must be an instance of "
                             "(Database, str, unicode)")
 
@@ -792,9 +792,9 @@ class Connection(object):  # TODO support auth for pooling
 
         .. versionadded:: 1.5
         """
-        if not isinstance(from_name, basestring):
+        if not isinstance(from_name, str):
             raise TypeError("from_name must be an instance of basestring")
-        if not isinstance(to_name, basestring):
+        if not isinstance(to_name, str):
             raise TypeError("to_name must be an instance of basestring")
 
         database._check_name(to_name)
@@ -816,5 +816,5 @@ class Connection(object):  # TODO support auth for pooling
     def __iter__(self):
         return self
 
-    def next(self):
+    def __next__(self):
         raise TypeError("'Connection' object is not iterable")

@@ -37,7 +37,7 @@ def _index_list(key_or_list, direction=None):
     if direction is not None:
         return [(key_or_list, direction)]
     else:
-        if isinstance(key_or_list, basestring):
+        if isinstance(key_or_list, str):
             return [(key_or_list, pymongo.ASCENDING)]
         elif not isinstance(key_or_list, list):
             raise TypeError("if no direction is specified, "
@@ -53,7 +53,7 @@ def _index_document(index_list):
     if isinstance(index_list, dict):
         raise TypeError("passing a dict to sort/create_index/hint is not "
                         "allowed - use a list of tuples instead. did you "
-                        "mean %r?" % list(index_list.iteritems()))
+                        "mean %r?" % list(index_list.items()))
     elif not isinstance(index_list, list):
         raise TypeError("must use a list of (key, direction) pairs, "
                         "not: %r" % index_list)
@@ -62,7 +62,7 @@ def _index_document(index_list):
 
     index = SON()
     for (key, value) in index_list:
-        if not isinstance(key, basestring):
+        if not isinstance(key, str):
             raise TypeError("first item in each key pair must be a string")
         if value not in [pymongo.ASCENDING, pymongo.DESCENDING, pymongo.GEO2D]:
             raise TypeError("second item in each key pair must be ASCENDING, "
@@ -110,15 +110,15 @@ def _unpack_response(response, cursor_id=None, as_class=dict):
 def _password_digest(username, password):
     """Get a password digest to use for authentication.
     """
-    if not isinstance(password, basestring):
+    if not isinstance(password, str):
         raise TypeError("password must be an instance of basestring")
-    if not isinstance(username, basestring):
+    if not isinstance(username, str):
         raise TypeError("username must be an instance of basestring")
 
     md5hash = _md5func()
     md5hash.update("%s:mongo:%s" % (username.encode('utf-8'),
                                     password.encode('utf-8')))
-    return unicode(md5hash.hexdigest())
+    return str(md5hash.hexdigest())
 
 
 def _auth_key(nonce, username, password):
@@ -126,8 +126,8 @@ def _auth_key(nonce, username, password):
     """
     digest = _password_digest(username, password)
     md5hash = _md5func()
-    md5hash.update("%s%s%s" % (nonce, unicode(username), digest))
-    return unicode(md5hash.hexdigest())
+    md5hash.update("%s%s%s" % (nonce, str(username), digest))
+    return str(md5hash.hexdigest())
 
 
 def _fields_list_to_dict(fields):
@@ -141,7 +141,7 @@ def _fields_list_to_dict(fields):
     """
     as_dict = {}
     for field in fields:
-        if not isinstance(field, basestring):
+        if not isinstance(field, str):
             raise TypeError("fields must be a list of key names as "
                             "(string, unicode)")
         as_dict[field] = 1

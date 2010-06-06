@@ -218,7 +218,7 @@ class Cursor(object):
         :Parameters:
           - `skip`: the number of results to skip
         """
-        if not isinstance(skip, (int, long)):
+        if not isinstance(skip, int):
             raise TypeError("skip must be an int")
         self.__check_okay_to_chain()
 
@@ -278,7 +278,7 @@ class Cursor(object):
             self.__limit = limit
             return self
 
-        if isinstance(index, (int, long)):
+        if isinstance(index, int):
             if index < 0:
                 raise IndexError("Cursor instances do not support negative"
                                  "indices")
@@ -384,7 +384,7 @@ class Cursor(object):
 
         .. versionadded:: 1.2
         """
-        if not isinstance(key, basestring):
+        if not isinstance(key, str):
             raise TypeError("key must be an instance of basestring")
 
         options = {"key": key}
@@ -406,7 +406,7 @@ class Cursor(object):
         # always use a hard limit for explains
         if c.__limit:
             c.__limit = -abs(c.__limit)
-        return c.next()
+        return next(c)
 
     def hint(self, index):
         """Adds a 'hint', telling Mongo the proper index to use for the query.
@@ -552,7 +552,7 @@ class Cursor(object):
     def __iter__(self):
         return self
 
-    def next(self):
+    def __next__(self):
         db = self.__collection.database
         if len(self.__data) or self._refresh():
             next = db._fix_outgoing(self.__data.pop(0), self.__collection)

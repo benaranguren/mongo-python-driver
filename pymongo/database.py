@@ -58,12 +58,12 @@ class Database(object):
 
         .. mongodoc:: databases
         """
-        if not isinstance(name, basestring):
+        if not isinstance(name, str):
             raise TypeError("name must be an instance of basestring")
 
         _check_name(name)
 
-        self.__name = unicode(name)
+        self.__name = str(name)
         self.__connection = connection
 
         self.__incoming_manipulators = []
@@ -278,7 +278,7 @@ class Database(object):
         .. mongodoc:: commands
         """
 
-        if isinstance(command, basestring):
+        if isinstance(command, str):
             command = SON([(command, value)])
 
         command.update(kwargs)
@@ -315,13 +315,13 @@ class Database(object):
         if isinstance(name, Collection):
             name = name.name
 
-        if not isinstance(name, basestring):
+        if not isinstance(name, str):
             raise TypeError("name_or_collection must be an instance of "
                             "(Collection, str, unicode)")
 
         self.__connection._purge_index(self.__name, name)
 
-        self.command("drop", unicode(name), allowable_errors=["ns not found"])
+        self.command("drop", str(name), allowable_errors=["ns not found"])
 
     def validate_collection(self, name_or_collection):
         """Validate a collection.
@@ -333,11 +333,11 @@ class Database(object):
         if isinstance(name, Collection):
             name = name.name
 
-        if not isinstance(name, basestring):
+        if not isinstance(name, str):
             raise TypeError("name_or_collection must be an instance of "
                             "(Collection, str, unicode)")
 
-        result = self.command("validate", unicode(name))
+        result = self.command("validate", str(name))
 
         info = result["result"]
         if info.find("exception") != -1 or info.find("corrupt") != -1:
@@ -424,7 +424,7 @@ class Database(object):
     def __iter__(self):
         return self
 
-    def next(self):
+    def __next__(self):
         raise TypeError("'Database' object is not iterable")
 
     def add_user(self, name, password):
@@ -502,15 +502,15 @@ class Database(object):
 
         .. mongodoc:: authenticate
         """
-        if not isinstance(name, basestring):
+        if not isinstance(name, str):
             raise TypeError("name must be an instance of basestring")
-        if not isinstance(password, basestring):
+        if not isinstance(password, str):
             raise TypeError("password must be an instance of basestring")
 
         nonce = self.command("getnonce")["nonce"]
         key = helpers._auth_key(nonce, name, password)
         try:
-            self.command("authenticate", user=unicode(name),
+            self.command("authenticate", user=str(name),
                          nonce=nonce, key=key)
             return True
         except OperationFailure:
